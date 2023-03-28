@@ -60,9 +60,6 @@ position = Vector2( 448, 448 )
 [node name="Wall9" parent="Board" instance=ExtResource( 2 )]
 position = Vector2( 256, 384 )
 
-[node name="Wall10" parent="Board" instance=ExtResource( 2 )]
-position = Vector2( 256, 320 )
-
 [node name="Wall11" parent="Board" instance=ExtResource( 2 )]
 position = Vector2( 192, 320 )
 
