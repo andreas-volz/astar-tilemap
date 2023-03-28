@@ -113,15 +113,21 @@ func set_unit_points_disabled(value: bool, exception_units: Array = []) -> void:
 			continue
 		astar.set_point_disabled(get_point(unit.global_position), value)
 
-func get_floodfill_positions(start_position: Vector2, min_range: int, max_range: int, skip_obstacles := true, skip_units := true, return_center := false) -> Array:
+func get_floodfill_positions(start_position: Vector2, min_range: int, max_range: int, skip_obstacles := true, skip_units := true, return_center := false) -> Dictionary:
 	var floodfill_positions := []
+	var floodfill_units := []
+	var floodfill_dictionary := {}
 	var checking_positions := [start_position]
 
 	while not checking_positions.empty():
 		var current_position : Vector2 = checking_positions.pop_back()
+				
 		if skip_obstacles and position_has_obstacle(current_position, start_position): continue
 		if skip_units and position_has_unit(current_position, start_position): continue
 		if current_position in floodfill_positions: continue
+		
+		if not skip_units and position_has_unit(current_position, start_position):
+			floodfill_units.append(current_position)
 
 		var current_point := get_point(current_position)
 		if not astar.has_point(current_point): continue
@@ -136,7 +142,10 @@ func get_floodfill_positions(start_position: Vector2, min_range: int, max_range:
 		for direction in DIRECTIONS:
 			var new_position := current_position + map_to_world(direction)
 			if skip_obstacles and position_has_obstacle(new_position): continue
-			if skip_units and position_has_unit(new_position): continue
+			if skip_units and position_has_unit(new_position):
+				if not floodfill_units.has(new_position):
+					floodfill_units.append(new_position)
+				continue
 			if new_position in floodfill_positions: continue
 
 			var new_point := get_point(new_position)
@@ -155,7 +164,10 @@ func get_floodfill_positions(start_position: Vector2, min_range: int, max_range:
 		if grid_distance < min_range:
 			floodfill_positions.erase(floodfill_position) # Since we are modifying the array here
 
-	return floodfill_positions
+	floodfill_dictionary["Moveable"] = floodfill_positions
+	floodfill_dictionary["Units"] = floodfill_units
+
+	return floodfill_dictionary
 
 func path_directions(path) -> Array:
 	# Convert a path into directional vectors whose sum would be path[length-1]
