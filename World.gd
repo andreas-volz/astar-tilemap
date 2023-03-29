@@ -4,6 +4,12 @@ var Flood = preload("res://Flood.tscn")
 
 var flood_objects : Array = []
 
+## The dictionary 'key' describe the texture index and the 'value' the Astar scale weight
+var navigation_texture_weights = {
+	0 : 1.0,
+	1 : 6.0,
+}
+
 onready var board = $Board
 onready var astarDebug = $AstarDebug
 onready var player = $Board/Player
@@ -11,6 +17,9 @@ onready var player2: Node2D = $Board/Player2
 onready var enemy: Node2D = $Board/Enemy
 onready var line = $Line
 onready var options_dialog: WindowDialog = $OptionsDialog
+
+func _ready() -> void:
+	board.update_texture_weight_scale(navigation_texture_weights)
 
 func _unhandled_input(event):
 	if event.is_action_pressed("mouse_left"):
@@ -26,7 +35,7 @@ func _unhandled_input(event):
 			path_points = board.get_astar_path_avoiding_obstacles_and_units(player.global_position, target_cell, exception_units, options_dialog.allow_unit_targets_check.pressed, max_routing_distance)
 		elif options_dialog.selected_avoidance == options_dialog.Avoidance.NONE:
 			path_points = board.get_astar_path(player.global_position, target_cell, max_routing_distance)
-				
+			
 		var target_unit = find_units_at_position(target_cell).pop_back()
 		if target_unit:
 			if target_unit.is_in_group("Player"):
@@ -73,7 +82,7 @@ func _unhandled_input(event):
 		if not path_points.empty():
 			var tween := create_tween().set_trans(Tween.TRANS_LINEAR)
 			for point in path_points:
-				tween.tween_property(player, "global_position", point, 0.2)
+				var _ignore = tween.tween_property(player, "global_position", point, 0.2)
 	
 	if event.is_action_pressed("mouse_right"):
 		line.points = []

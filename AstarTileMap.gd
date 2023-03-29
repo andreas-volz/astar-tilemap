@@ -39,12 +39,20 @@ func update() -> void:
 func create_pathfinding_points() -> void:
 	astar.clear()
 	var used_cell_positions = get_used_cell_global_positions()
+
 	for cell_position in used_cell_positions:
 		astar.add_point(get_point(cell_position), cell_position)
 
 	for cell_position in used_cell_positions:
 		connect_cardinals(cell_position)
-
+	
+func update_texture_weight_scale(texture_weights : Dictionary):
+	for id in texture_weights:
+		var weight = texture_weights[id]
+		var used_cell_positions = get_used_cell_global_positions(id)
+		for cell_position in used_cell_positions:
+			astar.set_point_weight_scale(get_point(cell_position), weight)
+	
 func add_obstacle(obstacle: Object) -> void:
 	obstacles.append(obstacle)
 	if not obstacle.is_connected("tree_exiting", self, "remove_obstacle"):
@@ -266,8 +274,13 @@ func has_point(point_position: Vector2) -> bool:
 	var point_id := get_point(point_position)
 	return astar.has_point(point_id)
 
-func get_used_cell_global_positions() -> Array:
-	var cells = get_used_cells()
+func get_used_cell_global_positions(id = -1) -> Array:
+	var cells
+	if id == -1:
+		cells = get_used_cells()
+	else:
+		cells = get_used_cells_by_id(id)
+	
 	var cell_positions := []
 	for cell in cells:
 		var cell_position := global_position + map_to_world(cell)
