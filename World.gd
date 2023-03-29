@@ -20,7 +20,7 @@ onready var options_dialog: WindowDialog = $OptionsDialog
 
 func _ready() -> void:
 	board.update_texture_weight_scale(navigation_texture_weights)
-
+		
 func _unhandled_input(event):
 	if event.is_action_pressed("mouse_left"):
 		var target_cell = (event.position / board.cell_size).floor() * board.cell_size
@@ -81,8 +81,12 @@ func _unhandled_input(event):
 			
 		if not path_points.empty():
 			var tween := create_tween().set_trans(Tween.TRANS_LINEAR)
+			
 			for point in path_points:
 				var _ignore = tween.tween_property(player, "global_position", point, 0.2)
+			tween.connect("finished", self, "_player_moved")
+			## block input until the anmation finish
+			set_process_unhandled_input(false)
 	
 	if event.is_action_pressed("mouse_right"):
 		line.points = []
@@ -106,3 +110,7 @@ func find_units_at_position(search_pos : Vector2) -> Array:
 func remove_flood_fill() -> void:
 	while not flood_objects.empty():
 		flood_objects.pop_back().queue_free()
+
+func _player_moved():
+	## unblock the input after animation finished
+	set_process_unhandled_input(true)
