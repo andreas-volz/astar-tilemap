@@ -69,6 +69,10 @@ func _unhandled_input(event):
 					flood.set_color(Color8(255, 0, 0, 50))
 			
 			flood_objects.append(flood)
+			
+		var tween := create_tween().set_trans(Tween.TRANS_LINEAR)
+		for point in path_points:
+			tween.tween_property(player, "global_position", point, 0.2)
 	
 	if event.is_action_pressed("mouse_right"):
 		line.points = []
