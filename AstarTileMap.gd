@@ -10,6 +10,11 @@ enum pairing_methods {
 	SZUDZIK_SIGNED,		# both positive and negative values
 	SZUDZIK_IMPROVED,	# improved version (best option)
 }
+enum UnitFlooding {
+	IGNORE,
+	SKIP,
+	SELECT,
+}
 
 export(pairing_methods) var current_pairing_method = pairing_methods.SZUDZIK_IMPROVED
 
@@ -112,7 +117,7 @@ func set_unit_points_disabled(value: bool, exception_units: Array = []) -> void:
 			continue
 		astar.set_point_disabled(get_point(unit.global_position), value)
 
-func get_floodfill_positions(start_position: Vector2, min_range: int, max_range: int, skip_obstacles := true, skip_units := true, return_center := false) -> Dictionary:
+func get_floodfill_positions(start_position: Vector2, min_range: int, max_range: int, skip_obstacles := true, unit_flooding := UnitFlooding.SKIP, return_center := false) -> Dictionary:
 	var floodfill_positions := []
 	var floodfill_units := []
 	var floodfill_dictionary := {}
@@ -122,12 +127,10 @@ func get_floodfill_positions(start_position: Vector2, min_range: int, max_range:
 		var current_position : Vector2 = checking_positions.pop_back()
 				
 		if skip_obstacles and position_has_obstacle(current_position, start_position): continue
-		if skip_units and position_has_unit(current_position, start_position): continue
+		if unit_flooding == UnitFlooding.SKIP and position_has_unit(current_position, start_position): continue
+			
 		if current_position in floodfill_positions: continue
 		
-		if not skip_units and position_has_unit(current_position, start_position):
-			floodfill_units.append(current_position)
-
 		var current_point := get_point(current_position)
 		if not astar.has_point(current_point): continue
 		if astar.is_point_disabled(current_point): continue
@@ -136,15 +139,17 @@ func get_floodfill_positions(start_position: Vector2, min_range: int, max_range:
 		var grid_distance := get_grid_distance(distance)
 		if grid_distance > max_range: continue
 
+		if unit_flooding == UnitFlooding.SELECT and position_has_unit(current_position, start_position):
+			if not floodfill_units.has(current_position):
+				floodfill_units.append(current_position)
+			continue
+
 		floodfill_positions.append(current_position)
 
 		for direction in DIRECTIONS:
 			var new_position := current_position + map_to_world(direction)
 			if skip_obstacles and position_has_obstacle(new_position): continue
-			if skip_units and position_has_unit(new_position):
-				if not floodfill_units.has(new_position):
-					floodfill_units.append(new_position)
-				continue
+
 			if new_position in floodfill_positions: continue
 
 			var new_point := get_point(new_position)
