@@ -73,6 +73,9 @@ position = Vector2( 320, 256 )
 [node name="Player2" parent="Board" groups=["Player"] instance=ExtResource( 3 )]
 position = Vector2( 320, 128 )
 
+[node name="Player3" parent="Board" groups=["Player"] instance=ExtResource( 3 )]
+position = Vector2( 448, 64 )
+
 [node name="Enemy" parent="Board" groups=["Enemy"] instance=ExtResource( 7 )]
 position = Vector2( 192, 256 )
 
@@ -89,3 +92,14 @@ begin_cap_mode = 2
 end_cap_mode = 2
 
 [node name="OptionsDialog" parent="." instance=ExtResource( 8 )]
+
+[node name="CenterContainer" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="CenterContainer"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -512.0
+margin_right = 512.0
+margin_bottom = 14.0
+text = "Press <Esc> for Navigation options..."
+align = 1

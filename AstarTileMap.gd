@@ -75,9 +75,9 @@ func position_has_unit(unit_position: Vector2, ignore_unit_position = null) -> b
 		if unit.global_position == unit_position: return true
 	return false
 
-func get_astar_path_avoiding_obstacles_and_units(start_position: Vector2, end_position: Vector2, exception_units := [], max_distance := -1) -> Array:
+func get_astar_path_avoiding_obstacles_and_units(start_position: Vector2, end_position: Vector2, exception_units := [], allow_unit_target = false, max_distance := -1) -> Array:
 	set_obstacles_points_disabled(true)
-	set_unit_points_disabled(true, exception_units)
+	set_unit_points_disabled(true, allow_unit_target, end_position, exception_units)
 	var astar_path := astar.get_point_path(get_point(start_position), get_point(end_position))
 	set_obstacles_points_disabled(false)
 	set_unit_points_disabled(false)
@@ -111,10 +111,14 @@ func set_obstacles_points_disabled(value: bool) -> void:
 	for obstacle in obstacles:
 		astar.set_point_disabled(get_point(obstacle.global_position), value)
 
-func set_unit_points_disabled(value: bool, exception_units: Array = []) -> void:
+func set_unit_points_disabled(value: bool, allow_unit_target = false, end_position = Vector2.ZERO, exception_units: Array = []) -> void:
 	for unit in units:
 		if unit in exception_units or unit.owner in exception_units:
 			continue
+			
+		if unit.global_position == end_position and allow_unit_target:
+			continue
+			
 		astar.set_point_disabled(get_point(unit.global_position), value)
 
 func get_floodfill_positions(start_position: Vector2, min_range: int, max_range: int, skip_obstacles := true, unit_flooding := UnitFlooding.SKIP, return_center := false) -> Dictionary:

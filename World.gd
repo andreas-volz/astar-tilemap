@@ -7,6 +7,8 @@ var flood_objects : Array = []
 onready var board = $Board
 onready var astarDebug = $AstarDebug
 onready var player = $Board/Player
+onready var player2: Node2D = $Board/Player2
+onready var enemy: Node2D = $Board/Enemy
 onready var line = $Line
 onready var options_dialog: WindowDialog = $OptionsDialog
 
@@ -14,20 +16,29 @@ func _unhandled_input(event):
 	if event.is_action_pressed("mouse_left"):
 		var target_cell = (event.position / board.cell_size).floor() * board.cell_size
 		var path_points
-			
+		
+		var exception_units = []
+		
 		if options_dialog.selected_avoidance == options_dialog.Avoidance.OBSTACLES:
 			path_points = board.get_astar_path_avoiding_obstacles(player.global_position, target_cell)
 		elif options_dialog.selected_avoidance == options_dialog.Avoidance.OBSTACLES_AND_UNITS:
-			path_points = board.get_astar_path_avoiding_obstacles_and_units(player.global_position, target_cell)
+			path_points = board.get_astar_path_avoiding_obstacles_and_units(player.global_position, target_cell, exception_units, options_dialog.allow_unit_targets_check.pressed)
 		elif options_dialog.selected_avoidance == options_dialog.Avoidance.NONE:
 			path_points = board.get_astar_path(player.global_position, target_cell)
 				
+		var target_unit = find_units_at_position(target_cell).pop_back()
+		if target_unit:
+			if target_unit.is_in_group("Player"):
+				line.default_color =  Color8(0, 255, 0, 255)
+			if target_unit.is_in_group("Enemy"):
+				line.default_color = Color8(255, 0, 0, 255)
+		else:
+			line.default_color = Color8(0, 0, 255, 255)
+			
 		line.position = board.cell_size/2 # Use offset to move line to center of tiles
 		line.points = path_points
 	
 		remove_flood_fill()
-				
-		#func get_floodfill_positions(start_position: Vector2, min_range: int, max_range: int, skip_obstacles := true, skip_units := true, return_center := false) -> Array:
 		
 		var skip_obstacles = options_dialog.skip_obstacles_check.pressed
 		var unit_flooding = options_dialog.selected_unit_flooding
