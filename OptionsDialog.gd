@@ -18,6 +18,7 @@ onready var avoidance_options: OptionButton = $CenterContainer/VBoxContainer3/VB
 onready var unit_flooding_options: OptionButton = $CenterContainer/VBoxContainer3/VBoxContainer2/UnitFloodingOptions
 onready var skip_obstacles_check: CheckBox = $CenterContainer/VBoxContainer3/VBoxContainer2/SkipObstaclesCheck
 onready var allow_unit_targets_check: CheckBox = $CenterContainer/VBoxContainer3/VBoxContainer/AllowUnitTargetsCheck
+onready var max_routing_distance: SpinBox = $CenterContainer/VBoxContainer3/VBoxContainer/HBoxContainer/MaxRoutingDistance
 
 func _ready() -> void:
 	add_array_to_dropdown(avoidance_options, avoidance_array)

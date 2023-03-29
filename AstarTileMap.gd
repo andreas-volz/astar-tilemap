@@ -76,6 +76,10 @@ func position_has_unit(unit_position: Vector2, ignore_unit_position = null) -> b
 	return false
 
 func get_astar_path_avoiding_obstacles_and_units(start_position: Vector2, end_position: Vector2, exception_units := [], allow_unit_target = false, max_distance := -1) -> Array:
+	var used_cell_positions = get_used_cell_global_positions()
+	if not used_cell_positions.has(end_position):
+		return []
+	
 	set_obstacles_points_disabled(true)
 	set_unit_points_disabled(true, allow_unit_target, end_position, exception_units)
 	var astar_path := astar.get_point_path(get_point(start_position), get_point(end_position))
@@ -84,6 +88,10 @@ func get_astar_path_avoiding_obstacles_and_units(start_position: Vector2, end_po
 	return set_path_length(astar_path, max_distance)
 
 func get_astar_path_avoiding_obstacles(start_position: Vector2, end_position: Vector2, max_distance := -1) -> Array:
+	var used_cell_positions = get_used_cell_global_positions()
+	if not used_cell_positions.has(end_position):
+		return []
+		
 	set_obstacles_points_disabled(true)
 	var path_points := astar.get_point_path(get_point(start_position), get_point(end_position))
 	set_obstacles_points_disabled(false)
@@ -98,6 +106,10 @@ func stop_path_at_unit(potential_path_points: Array) -> Array:
 	return potential_path_points
 
 func get_astar_path(start_position: Vector2, end_position: Vector2, max_distance := -1) -> Array:
+	var used_cell_positions = get_used_cell_global_positions()
+	if not used_cell_positions.has(end_position):
+		return []
+		
 	var astar_path := astar.get_point_path(get_point(start_position), get_point(end_position))
 	return set_path_length(astar_path, max_distance)
 

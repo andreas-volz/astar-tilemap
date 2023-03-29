@@ -19,12 +19,13 @@ func _unhandled_input(event):
 		
 		var exception_units = []
 		
+		var max_routing_distance = options_dialog.max_routing_distance.value
 		if options_dialog.selected_avoidance == options_dialog.Avoidance.OBSTACLES:
-			path_points = board.get_astar_path_avoiding_obstacles(player.global_position, target_cell)
+			path_points = board.get_astar_path_avoiding_obstacles(player.global_position, target_cell, max_routing_distance)
 		elif options_dialog.selected_avoidance == options_dialog.Avoidance.OBSTACLES_AND_UNITS:
-			path_points = board.get_astar_path_avoiding_obstacles_and_units(player.global_position, target_cell, exception_units, options_dialog.allow_unit_targets_check.pressed)
+			path_points = board.get_astar_path_avoiding_obstacles_and_units(player.global_position, target_cell, exception_units, options_dialog.allow_unit_targets_check.pressed, max_routing_distance)
 		elif options_dialog.selected_avoidance == options_dialog.Avoidance.NONE:
-			path_points = board.get_astar_path(player.global_position, target_cell)
+			path_points = board.get_astar_path(player.global_position, target_cell, max_routing_distance)
 				
 		var target_unit = find_units_at_position(target_cell).pop_back()
 		if target_unit:
